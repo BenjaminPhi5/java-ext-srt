@@ -1,4 +1,4 @@
-package dataAnalysis;
+package dataAnalysis.readSpeeds;
 
 import java.io.EOFException;
 import java.io.IOException;

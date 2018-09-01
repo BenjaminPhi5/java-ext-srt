@@ -1,4 +1,4 @@
-package dataAnalysis;
+package dataAnalysis.readSpeeds;
 
 import java.io.*;
 import java.nio.ByteBuffer;

@@ -1,5 +1,8 @@
 package dataAnalysis;
 
+import dataAnalysis.readSpeeds.ByteBufferInput;
+import dataAnalysis.readSpeeds.StandardFileRead;
+
 import java.io.IOException;
 
 public class AnalysingData {
