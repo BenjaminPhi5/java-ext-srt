@@ -35,7 +35,7 @@ public class AnalysingData {
         // Tests read speeds of different reader inputs,
         // to just read the whole file and perform a comparison on each digit
 
-        int bufferSize = 5000;
+        int bufferSize = 1<<16;
         long time = System.currentTimeMillis();
 
         System.out.println("Using a Byte buffer reader");
@@ -44,6 +44,17 @@ public class AnalysingData {
         System.out.print("time: ");
         System.out.println(System.currentTimeMillis() - time);
         System.out.println("-------------\n\n");
+/*
+        System.out.println("Using a CUSTOM READER");
+        CustomReader customReader = new CustomReader();
+        customReader.run(fx);
+        System.out.print("time: ");
+        System.out.println(System.currentTimeMillis() - time);
+        System.out.println("-------------\n\n");
+
+    // it needs to actually check when its got to the end of the file and then stop.
+
+*/
 
         System.out.println("Using a standard file read");
         StandardFileRead standardFileRead = new StandardFileRead();
