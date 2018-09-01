@@ -46,9 +46,13 @@ public class ExternalSort {
     }
 
     public static void main(String[] args) throws Exception {
-        String f1 = args[0];
-        String f2 = args[1];
-        sort(f1, f2);
-        System.out.println("The checksum is: "+checkSum(f1));
+        //String f1 = args[0];
+        //String f2 = args[1];
+        //
+        // sort(f1, f2);
+        System.out.println("test printing out a string");
+        MyExtraFile myExtraFile = new MyExtraFile();
+        myExtraFile.test();
+        //System.out.println("The checksum is: "+checkSum(f1));
     }
 }
