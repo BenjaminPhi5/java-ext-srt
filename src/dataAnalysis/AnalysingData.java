@@ -38,6 +38,13 @@ public class AnalysingData {
         System.out.print("time: ");
         System.out.println(System.currentTimeMillis() - time);
         System.out.println("-------------\n\n");
+
+        System.out.println("Using a standard file read");
+        StandardFileRead standardFileRead = new StandardFileRead();
+        standardFileRead.run(f1);
+        System.out.print("time: ");
+        System.out.println(System.currentTimeMillis() - time);
+        System.out.println("-------------\n\n");
     }
 
 }
