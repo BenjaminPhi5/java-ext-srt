@@ -11,13 +11,16 @@ public class StandardFileRead {
         System.out.println("USING READ INT");
         try {
             RandomAccessFile f = new RandomAccessFile(f1, "rw");
+            //RandomAccessFile f = new RandomAccessFile("test-suite/test10a.dat", "rw");
+            int negatives = 0;
             for (int i = 0; i < 10000; i++) {
-                //System.out.println("value read in is: " + f.readInt());
+                System.out.print(f.readInt() + ", ");
                 if (f.readInt() < 0) {
-                    System.out.println("ooh a negative"); //there are no negatives, im just giving it a pointless comparison to do.
+                    negatives += 1;
+                    //System.out.println("ooh a negative"); //there are no negatives, im just giving it a pointless comparison to do.
                 }
-                System.out.println("Error: reached cap, your bound isnt big enough");
             }
+            System.out.println("Error: reached cap, your bound isnt big enough");
         } catch (EOFException e){
             return;
         }

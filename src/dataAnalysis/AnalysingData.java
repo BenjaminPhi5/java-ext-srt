@@ -7,6 +7,7 @@ public class AnalysingData {
     //This class is for messing about for reading in the data and looking at it etc.
     private String f1;
     private String f2;
+    private String fx;
 
     // REMEMBER WHEN RUNNING THE CODE
     // YOU NEED TO LIMIT THE SIZE OF RAM ALLOWED SEE THE EXAMPLE THEY GIVE FOR THE PROGRAM PARAMETERS
@@ -21,7 +22,12 @@ public class AnalysingData {
 
     public void run() throws IOException{
 
-        testReadSpeed();
+        for(int i = 1; i <= 17; i++){
+         fx = "test-suite/test" + i + "a.dat";
+         System.out.println("\nTEST " + i);
+         testReadSpeed();
+        }
+
     }
 
 
@@ -34,15 +40,15 @@ public class AnalysingData {
 
         System.out.println("Using a Byte buffer reader");
         ByteBufferInput byteBufferInput = new ByteBufferInput();
-        byteBufferInput.run(f1, bufferSize);
+        byteBufferInput.run(fx, bufferSize);
         System.out.print("time: ");
         System.out.println(System.currentTimeMillis() - time);
         System.out.println("-------------\n\n");
 
         System.out.println("Using a standard file read");
         StandardFileRead standardFileRead = new StandardFileRead();
-        standardFileRead.run(f1);
-        System.out.print("time: ");
+        standardFileRead.run(fx);
+        System.out.print("\ntime: ");
         System.out.println(System.currentTimeMillis() - time);
         System.out.println("-------------\n\n");
     }
