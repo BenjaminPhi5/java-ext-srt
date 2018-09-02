@@ -1,6 +1,8 @@
 package dataAnalysis;
 
+import dataAnalysis.readSpeeds.ByteArrayAndByteBuffer;
 import dataAnalysis.readSpeeds.ByteBufferInput;
+import dataAnalysis.readSpeeds.RawByteArrayRead;
 import dataAnalysis.readSpeeds.StandardFileRead;
 
 import java.io.IOException;
@@ -44,10 +46,10 @@ public class AnalysingData {
         System.out.println("Using a Byte buffer reader");
         ByteBufferInput byteBufferInput = new ByteBufferInput();
         byteBufferInput.run(fx, bufferSize);
-        System.out.print("time: ");
-        System.out.println(System.currentTimeMillis() - time);
-        System.out.println("-------------\n\n");
+        long timeBBR = System.currentTimeMillis() - time;
+        System.out.println("-------------\n");
 /*
+        time = System.currentTimeMillis();
         System.out.println("Using a CUSTOM READER");
         CustomReader customReader = new CustomReader();
         customReader.run(fx);
@@ -59,12 +61,28 @@ public class AnalysingData {
 
 */
 
+        System.out.println("Using a RAW BYTE ARRAY");
+        time = System.currentTimeMillis();
+        RawByteArrayRead rawByteArrayRead = new RawByteArrayRead();
+        rawByteArrayRead.run(fx);
+        long timeRBA = System.currentTimeMillis() - time;
+        System.out.println("-------------\n");
+
+        System.out.println("Using a Byte Array and Byte BUffer");
+        time = System.currentTimeMillis();
+        ByteArrayAndByteBuffer byteArrayAndByteBuffer = new ByteArrayAndByteBuffer();
+        byteArrayAndByteBuffer.run(fx);
+        long timeBABR = System.currentTimeMillis() - time;
+        System.out.println("-------------\n");
+
         System.out.println("Using a standard file read");
+        time = System.currentTimeMillis();
         StandardFileRead standardFileRead = new StandardFileRead();
         standardFileRead.run(fx);
-        System.out.print("\ntime: ");
-        System.out.println(System.currentTimeMillis() - time);
+        long timeSFR = System.currentTimeMillis() - time;
         System.out.println("-------------\n\n");
+
+        System.out.println("time:\nByte buffer reader: " + timeBBR + "\nRaw byte array: " + timeRBA + "\nByte array, byte buffer: " + timeBABR + "\nStandard file read: " + timeSFR);
     }
 
 }
