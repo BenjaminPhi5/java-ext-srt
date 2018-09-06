@@ -47,6 +47,7 @@ public class ByteArrayAndByteBuffer {
             RandomAccessFile f = new RandomAccessFile(f1, "rw");
             int negatives = 0;
             int lowest = Integer.MAX_VALUE;
+            int smallest = Integer.MAX_VALUE;
             int highest = Integer.MIN_VALUE;
             int current;
             int total = 0;
@@ -63,14 +64,18 @@ public class ByteArrayAndByteBuffer {
                 for(int i = 0; i < bytesRead/4; i++){
                     current = wrapped.getInt();
                     total++;
-                    if(current < 0){
-                        negatives++;
-                    }
                     if(current < lowest){
                         lowest = current;
                     }
                     if(current > highest){
                         highest = current;
+                    }
+                    if(current < 0){
+                        negatives++;
+                        current *= -1;
+                    }
+                    if(current < smallest){
+                        smallest = current;
                     }
                 }
 
@@ -78,7 +83,7 @@ public class ByteArrayAndByteBuffer {
 
             }
             System.out.println("total: " + total + "\tnegatives: " + negatives);
-            System.out.println("lowest: " + lowest + "\thighest: " + highest);
+            System.out.println("lowest: " + lowest + "\thighest: " + highest +"\tsmallest:"+smallest);
 
         } catch (EOFException e){
             //I dont think this catch needs to be in anymore wont happen due to while loop
