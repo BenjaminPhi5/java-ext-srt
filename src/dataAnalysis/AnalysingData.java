@@ -28,9 +28,12 @@ public class AnalysingData {
     public void run() throws IOException{
 
         for(int i = 1; i <= 17; i++){
-         fx = "test-suite/test" + i + "a.dat";
-         System.out.println("\nTEST " + i);
-         testReadSpeed();
+            fx = "test-suite/test" + i + "a.dat";
+            System.out.println("\nTEST " + i);
+            //testReadSpeed();
+            // I CONCLUDED byte array byte buffer was fastest, may need to check the method used,
+            // i think the read method, maybe to specify a cap on the data i don't know.
+            testIntegerValues();
         }
 
     }
@@ -83,6 +86,11 @@ public class AnalysingData {
         System.out.println("-------------\n\n");
 
         System.out.println("time:\nByte buffer reader: " + timeBBR + "\nRaw byte array: " + timeRBA + "\nByte array, byte buffer: " + timeBABR + "\nStandard file read: " + timeSFR);
+    }
+
+    public void testIntegerValues() throws IOException{
+        ByteArrayAndByteBuffer byteArrayAndByteBuffer = new ByteArrayAndByteBuffer();
+        byteArrayAndByteBuffer.runAnalysis(fx);
     }
 
 }
