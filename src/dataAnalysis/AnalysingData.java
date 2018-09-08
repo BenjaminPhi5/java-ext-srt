@@ -33,6 +33,9 @@ public class AnalysingData {
             //testReadSpeed();
             // I CONCLUDED byte array byte buffer was fastest, may need to check the method used,
             // i think the read method, maybe to specify a cap on the data i don't know.
+
+
+            //memoryAvailable();
             testIntegerValues();
         }
 
@@ -91,6 +94,18 @@ public class AnalysingData {
     public void testIntegerValues() throws IOException{
         ByteArrayAndByteBuffer byteArrayAndByteBuffer = new ByteArrayAndByteBuffer();
         byteArrayAndByteBuffer.runAnalysis(fx);
+    }
+
+    public void memoryAvailable() {
+        Runtime r = Runtime.getRuntime();
+        long freeMem = r.freeMemory();
+        long maxMem = r.maxMemory();
+        long totalMem = r.totalMemory();
+
+        long allocatedMem = totalMem - freeMem;
+        long presFreeMem = maxMem - allocatedMem;
+        System.out.println("Allocated Memory in JVM:                " + allocatedMem);
+        System.out.println("present free memory:                    " + presFreeMem);
     }
 
 }

@@ -4,6 +4,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
+import java.util.HashMap;
 
 public class ByteArrayAndByteBuffer {
 
@@ -45,6 +46,7 @@ public class ByteArrayAndByteBuffer {
 
         try {
             RandomAccessFile f = new RandomAccessFile(f1, "rw");
+            HashMap<Integer, Integer> repetitions = new HashMap<>();
             int negatives = 0;
             int lowest = Integer.MAX_VALUE;
             int smallest = Integer.MAX_VALUE;
@@ -70,6 +72,9 @@ public class ByteArrayAndByteBuffer {
                     if(current > highest){
                         highest = current;
                     }
+
+                    repetitions.put(current, repetitions.getOrDefault(current, 0) + 1);
+
                     if(current < 0){
                         negatives++;
                         current *= -1;
@@ -82,6 +87,13 @@ public class ByteArrayAndByteBuffer {
                 bytesRead = f.read(buffer);
 
             }
+
+            HashMap<Integer, Integer> values = calcMinMaxReps(repetitions);
+
+            System.out.println("min reps is: " + values.get(1) + "\tvalue: " + values.get(0));
+            System.out.println("max reps is: " + values.get(3) + "\tvalue: " + values.get(1));
+            System.out.println("unique values: " + values.get(4));
+
             System.out.println("total: " + total + "\tnegatives: " + negatives);
             System.out.println("lowest: " + lowest + "\thighest: " + highest +"\tsmallest:"+smallest);
 
@@ -91,6 +103,41 @@ public class ByteArrayAndByteBuffer {
             return;
         }
     }
+
+    private HashMap<Integer, Integer> calcMinMaxReps(HashMap<Integer, Integer> repetitions){
+        int valueMin = 0;
+        int repsMin = Integer.MAX_VALUE;
+        int valueMax = 0;
+        int repsMax = 0;
+        int uniqueVals = repetitions.keySet().size();
+
+        for(Integer i : repetitions.keySet()) {
+            int reps = repetitions.get(i);
+
+            if (reps < repsMin) {
+                repsMin = reps;
+                valueMin = i;
+            }
+
+            else if (reps > repsMax) {
+                repsMax = reps;
+                valueMax = i;
+            }
+
+        }
+
+        HashMap<Integer, Integer> values = new HashMap<>();
+        values.put(0, valueMin);
+        values.put(1, repsMin);
+        values.put(2, valueMax);
+        values.put(3, repsMax);
+        values.put(4, uniqueVals);
+
+        return values;
+
+    }
+
+    
 
 
 }
