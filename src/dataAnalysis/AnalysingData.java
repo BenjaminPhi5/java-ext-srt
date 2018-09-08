@@ -1,9 +1,6 @@
 package dataAnalysis;
 
-import dataAnalysis.readSpeeds.ByteArrayAndByteBuffer;
-import dataAnalysis.readSpeeds.ByteBufferInput;
-import dataAnalysis.readSpeeds.RawByteArrayRead;
-import dataAnalysis.readSpeeds.StandardFileRead;
+import dataAnalysis.readSpeeds.*;
 
 import java.io.IOException;
 
@@ -30,13 +27,13 @@ public class AnalysingData {
         for(int i = 1; i <= 17; i++){
             fx = "test-suite/test" + i + "a.dat";
             System.out.println("\nTEST " + i);
-            //testReadSpeed();
+            testReadSpeed();
             // I CONCLUDED byte array byte buffer was fastest, may need to check the method used,
             // i think the read method, maybe to specify a cap on the data i don't know.
 
 
             //memoryAvailable();
-            testIntegerValues();
+            //testIntegerValues();
         }
 
     }
@@ -81,6 +78,13 @@ public class AnalysingData {
         long timeBABR = System.currentTimeMillis() - time;
         System.out.println("-------------\n");
 
+        System.out.println("Using a DIRECT BUFFER");
+        time = System.currentTimeMillis();
+        DirectBuffer directBuffer = new DirectBuffer();
+        directBuffer.run(fx);
+        long timeDB = System.currentTimeMillis() - time;
+        System.out.println("-------------\n");
+
         System.out.println("Using a standard file read");
         time = System.currentTimeMillis();
         StandardFileRead standardFileRead = new StandardFileRead();
@@ -88,7 +92,7 @@ public class AnalysingData {
         long timeSFR = System.currentTimeMillis() - time;
         System.out.println("-------------\n\n");
 
-        System.out.println("time:\nByte buffer reader: " + timeBBR + "\nRaw byte array: " + timeRBA + "\nByte array, byte buffer: " + timeBABR + "\nStandard file read: " + timeSFR);
+        System.out.println("time:\nByte buffer reader: " + timeBBR + "\nRaw byte array: " + timeRBA + "\nByte array, byte buffer: " + timeBABR + "\nDirect Buffer: " + timeDB +"\nStandard file read: " + timeSFR);
     }
 
     public void testIntegerValues() throws IOException{

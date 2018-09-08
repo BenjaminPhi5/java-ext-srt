@@ -14,7 +14,7 @@ public class StandardFileRead {
             //RandomAccessFile f = new RandomAccessFile("test-suite/test10a.dat", "rw");
             int negatives = 0;
             for (int i = 0; i < 10000; i++) {
-                System.out.print(f.readInt() + ", ");
+                //System.out.print(f.readInt() + ", ");
                 if (f.readInt() < 0) {
                     negatives += 1;
                     //System.out.println("ooh a negative"); //there are no negatives, im just giving it a pointless comparison to do.
