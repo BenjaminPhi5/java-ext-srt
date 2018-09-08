@@ -1,5 +1,7 @@
 package dataAnalysis;
 
+import dataAnalysis.ReadIn.ConcurrentQueueTest;
+import dataAnalysis.ReadIn.ReadFile;
 import dataAnalysis.readSpeeds.*;
 
 import java.io.IOException;
@@ -33,8 +35,9 @@ public class AnalysingData {
 
 
             //memoryAvailable();
-            testIntegerValues();
+            //testIntegerValues();
             //testBucketValues();
+            readIn();
         }
 
     }
@@ -116,6 +119,16 @@ public class AnalysingData {
     public void testBucketValues() throws IOException{
         ByteArrayAndByteBuffer byteArrayAndByteBuffer = new ByteArrayAndByteBuffer();
         byteArrayAndByteBuffer.runBuckets(fx);
+    }
+
+    public void readIn(){
+        ReadFile readFile = new ReadFile();
+        readFile.readF(fx);
+        ConcurrentQueueTest concurrentQueueTest = new ConcurrentQueueTest(1, 1, fx);
+        concurrentQueueTest.run();
+        System.out.println("smallest: " + concurrentQueueTest.smallest);
+        System.out.println("biggest: " + concurrentQueueTest.biggest);
+        System.out.println("total: " + concurrentQueueTest.total);
     }
 
 }

@@ -1,6 +1,7 @@
 package dataAnalysis.readSpeeds;
 
 import java.io.EOFException;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
@@ -45,7 +46,9 @@ public class ByteArrayAndByteBuffer {
     public void runAnalysis(String f1) throws IOException {
 
         try {
-            RandomAccessFile f = new RandomAccessFile(f1, "rw");
+            //RandomAccessFile f = new RandomAccessFile(f1, "rw");
+            FileInputStream fis =
+                    new FileInputStream(f1);
             HashMap<Integer, Integer> repetitions = new HashMap<>();
             int negatives = 0;
             int lowest = Integer.MAX_VALUE;
@@ -55,7 +58,8 @@ public class ByteArrayAndByteBuffer {
             int total = 0;
 
             byte[] buffer = new byte[BUFFER_SIZE];
-            int bytesRead = f.read(buffer);
+            //int bytesRead = f.read(buffer);
+            int bytesRead = fis.read(buffer);
 
             while(bytesRead != -1){
                 if(bytesRead > BUFFER_SIZE){
@@ -84,7 +88,8 @@ public class ByteArrayAndByteBuffer {
                     }
                 }
 
-                bytesRead = f.read(buffer);
+                //bytesRead = f.read(buffer);
+                bytesRead = fis.read(buffer);
 
             }
 
