@@ -1,9 +1,6 @@
 package dataAnalysis;
 
-import dataAnalysis.ReadIn.ConcurrentQueueTest;
-import dataAnalysis.ReadIn.DirectBufferReadIn;
-import dataAnalysis.ReadIn.OneReadOneWrite;
-import dataAnalysis.ReadIn.ReadFile;
+import dataAnalysis.ReadIn.*;
 import dataAnalysis.readSpeeds.*;
 
 import java.io.IOException;
@@ -128,10 +125,11 @@ public class AnalysingData {
         //readFile.readF(fx);
 
 
-        long time = System.currentTimeMillis();
-        //ConcurrentQueueTest concurrentQueueTest = new ConcurrentQueueTest(10, 1, fx);
-        //concurrentQueueTest.run();
-        //System.out.println("time: concurrent: " + (System.currentTimeMillis() - time));
+        long time;
+        time = System.currentTimeMillis();
+        DirectBufferThreaded concurrentQueueTest = new DirectBufferThreaded(fx);
+        concurrentQueueTest.run();
+        System.out.println("\ntime: concurrent: " + (System.currentTimeMillis() - time));
 
         time = System.currentTimeMillis();
         DirectBufferReadIn directBufferReadIn = new DirectBufferReadIn();
