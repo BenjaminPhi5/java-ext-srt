@@ -27,13 +27,14 @@ public class AnalysingData {
         for(int i = 1; i <= 17; i++){
             fx = "test-suite/test" + i + "a.dat";
             System.out.println("\nTEST " + i);
-            testReadSpeed();
+            //testReadSpeed();
             // I CONCLUDED byte array byte buffer was fastest, may need to check the method used,
             // i think the read method, maybe to specify a cap on the data i don't know.
 
 
             //memoryAvailable();
-            //testIntegerValues();
+            testIntegerValues();
+            //testBucketValues();
         }
 
     }
@@ -110,6 +111,11 @@ public class AnalysingData {
         long presFreeMem = maxMem - allocatedMem;
         System.out.println("Allocated Memory in JVM:                " + allocatedMem);
         System.out.println("present free memory:                    " + presFreeMem);
+    }
+
+    public void testBucketValues() throws IOException{
+        ByteArrayAndByteBuffer byteArrayAndByteBuffer = new ByteArrayAndByteBuffer();
+        byteArrayAndByteBuffer.runBuckets(fx);
     }
 
 }

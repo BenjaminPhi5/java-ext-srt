@@ -137,7 +137,91 @@ public class ByteArrayAndByteBuffer {
 
     }
 
+    public void runBuckets(String f1) throws IOException {
+        try {
+            RandomAccessFile f = new RandomAccessFile(f1, "rw");
+            HashMap<Integer, Integer> buckets = new HashMap<>();
+            buckets.put(0, 0); // 0 - 9.
+            buckets.put(1, 0); // 10 - 99.
+            buckets.put(2, 0); // 100 - 999.
+            buckets.put(3, 0); // 1000 - 9999.
+            buckets.put(4, 0); // 10000 - 99999.
+            buckets.put(5, 0); // 100000 - 999999.
+            buckets.put(6, 0); // 1000000 - 9999999.
+            buckets.put(7, 0); // 10000000 - 99999999.
+            buckets.put(8, 0); // 100000000 - 999999999.
+            buckets.put(9, 0); // 1000000000 - MAX.
 
+            buckets.put(12, 0); // 0 - 9. //NEGATIVES BELOW
+            buckets.put(13, 0); // 10 - 99.
+            buckets.put(14, 0); // 100 - 999.
+            buckets.put(15, 0); // 1000 - 9999.
+            buckets.put(16, 0); // 10000 - 99999.
+            buckets.put(17, 0); // 100000 - 999999.
+            buckets.put(18, 0); // 1000000 - 9999999.
+            buckets.put(19, 0); // 10000000 - 99999999.
+            buckets.put(20, 0); // 100000000 - 999999999.
+            buckets.put(21, 0); // 1000000000 - MAX.
+
+
+
+            byte[] buffer = new byte[BUFFER_SIZE];
+            int bytesRead = f.read(buffer);
+
+            while(bytesRead != -1){
+                if(bytesRead > BUFFER_SIZE){
+                    System.out.println("boi you got an error here, you need to cap the amount it reads in okay");
+                }
+
+                ByteBuffer wrapped = ByteBuffer.wrap(buffer);
+                for(int i = 0; i < bytesRead/4; i++){
+                    int x = wrapped.getInt();
+                    int neg = 0;
+                    if(x < 0){
+                        neg = 12;
+                        x *= -1;
+                    }
+                    bucketValues(buckets, neg, x);
+                }
+
+                bytesRead = f.read(buffer);
+
+            }
+
+            System.out.printf("Buckets (powers of 10) POS:\n |0-1|:%d\n  |1-2|:%d\n  |2-3|:%d\n  |3-4|:%d\n  |4-5|:%d\n  |5-6|:%d\n  |6-7|:%d\n  |7-8|:%d\n  |8-9|:%d\n |9-MAX|:%d\n",buckets.get(0),buckets.get(1),buckets.get(2),buckets.get(3),buckets.get(4),buckets.get(5),buckets.get(6),buckets.get(7),buckets.get(8),buckets.get(9));
+            System.out.printf("Buckets (powers of 10) NEG:\n |0-1|:%d\n  |1-2|:%d\n  |2-3|:%d\n  |3-4|:%d\n  |4-5|:%d\n  |5-6|:%d\n  |6-7|:%d\n  |7-8|:%d\n  |8-9|:%d\n |9-MAX|:%d\n",buckets.get(12),buckets.get(13),buckets.get(14),buckets.get(15),buckets.get(16),buckets.get(17),buckets.get(18),buckets.get(19),buckets.get(20),buckets.get(21));
+
+
+        } catch (EOFException e){
+            //I dont think this catch needs to be in anymore wont happen due to while loop
+            System.out.println("end of file error not handled");
+            return;
+        }
+    }
+
+    private void bucketValues(HashMap<Integer, Integer> buckets, int neg, int x){
+        if(x < 9){
+            buckets.put(neg, buckets.get(neg)+1);
+        } else if(x < 99) {
+            buckets.put(neg + 1, buckets.get(neg+1)+1);
+        } else if(x < 999) {
+            buckets.put(neg + 2, buckets.get(neg+2)+1);
+        } else if(x < 9999) {
+            buckets.put(neg + 3, buckets.get(neg+3)+1);
+        } else if(x < 99999) {
+            buckets.put(neg + 4, buckets.get(neg+4)+1);
+        } else if(x < 999999) {
+            buckets.put(neg + 5, buckets.get(neg+5)+1);
+        } else if(x < 9999999) {
+            buckets.put(neg + 6, buckets.get(neg+6)+1);
+        } else if(x < 99999999) {
+            buckets.put(neg + 7, buckets.get(neg+7)+1);
+        } else if(x < 999999999) {
+            buckets.put(neg + 8, buckets.get(neg+8)+1);
+        } else if(x < Integer.MAX_VALUE) {
+            buckets.put(neg + 9, buckets.get(neg + 9) + 1);
+        }
+    }
 
 
 }
