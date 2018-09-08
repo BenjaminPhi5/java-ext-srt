@@ -7,11 +7,23 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class ConcurrentQueueTest {
 
-    private ConcurrentLinkedQueue<byte[]> q;
+    private ConcurrentLinkedQueue<Data> q;
     private String filename;
+
+    private class Data{
+        public byte[] buffer;
+        public int total;
+
+        Data(byte[] buffer, int total){
+            this.buffer = buffer;
+            this.total = total;
+        }
+    }
 
     private class Producer extends Thread {
         private int sent = 0;
@@ -29,7 +41,9 @@ public class ConcurrentQueueTest {
                 byte buf[] = new byte[1<<16];
                 int n;
                 while ((n = fis.read(buf)) != -1) {
-                    q.offer(buf);
+                    // adding ints read to the front
+                    q.offer(new Data(buf, n/4));
+                    //System.out.println("total at read:" + n/4);
                     sent++;
                     buf = new byte[1<<16];
                 }
@@ -46,16 +60,19 @@ public class ConcurrentQueueTest {
 
     private class Consumer extends Thread {
         private int recv = 0;
-        int local_max = 0, local_min = Integer.MAX_VALUE, local_total = 0;
+        int local_max;
+        int local_min;
+        int local_total;
 
         public void run() {
-            byte[] r;
+            Data r;
             int x;
-            while ((r = q.poll()) == null || ! (new String(r).equals("EOF"))) {
+            while ((r = q.poll()) == null || ! ((new String(r.buffer)).equals("EOF"))) {
                 if (r != null) {
+                    local_max = 0; local_min = Integer.MAX_VALUE; local_total = 0;
                     // this bit gets the int and checks the values
 
-                    byte[] buf = r;
+                    byte[] buf = r.buffer;
                     local_total += buf.length/4;
                     for(int i = 0; i <  buf.length/ 4; i++){
                         x  = (((int) buf[4*i+3]) & 255)
@@ -70,8 +87,9 @@ public class ConcurrentQueueTest {
 
                     /*
                     try {
-                        IntBuffer wrapped = ByteBuffer.wrap(r).asIntBuffer();
-                        while (wrapped.hasRemaining()){
+                        IntBuffer wrapped = ByteBuffer.wrap(r.buffer).asIntBuffer();
+                        while (r.total > 0){
+                            r.total--;
                             local_total++;
                             x = wrapped.get();
                             if(x < local_min)
@@ -81,13 +99,27 @@ public class ConcurrentQueueTest {
                         }
                     } catch (UnsupportedOperationException e) {// do nothing
                 }
+
                 */
+                    readWriteLock.writeLock().lock();
+                    {
+                        total += local_total;
+                        if(local_max > biggest)
+                            biggest = local_max;
+                        if(local_min < smallest)
+                            smallest = local_min;
+                        //System.out.println("local total: " + local_total);
+                    }
+                    readWriteLock.writeLock().unlock();
+
                     recv++;
+
+
                 } else {
                     Thread.yield();
                 }
             }
-            q.offer(("EOF").getBytes());
+            q.offer(new Data(("EOF").getBytes(), 0));
         }
 
         public int numberConsumed() {
@@ -100,8 +132,10 @@ public class ConcurrentQueueTest {
     public int smallest;
     public int biggest;
     public int total;
+    ReadWriteLock readWriteLock;
 
     public ConcurrentQueueTest(int c, int p, String filename) {
+        readWriteLock = new ReentrantReadWriteLock();
         smallest = Integer.MAX_VALUE;
         biggest = 0;
         total = 0;
@@ -131,23 +165,17 @@ public class ConcurrentQueueTest {
             } catch (InterruptedException e) {
             }
         }
-        q.offer("EOF".getBytes());
+        q.offer(new Data("EOF".getBytes(), 0));
         for (Consumer c : consumers) {
             try {
-                total += c.local_total;
-                if(c.local_max > biggest)
-                    biggest = c.local_max;
-                if(c.local_min < smallest)
-                    smallest = c.local_min;
-
                 c.join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-        int recv = Arrays.stream(consumers).mapToInt(Consumer::numberConsumed).sum();
-        int sent = Arrays.stream(producers).mapToInt(Producer::numberProduced).sum();
-
+        //int recv = Arrays.stream(consumers).mapToInt(Consumer::numberConsumed).sum();
+        //int sent = Arrays.stream(producers).mapToInt(Producer::numberProduced).sum();
+        /*
         System.out.println("Recv: " + recv + "\nSent: " + sent+"\n-----");
         System.out.printf("%s (%d,%d):\t%s%n",
                 q.getClass().getSimpleName(),
@@ -155,5 +183,11 @@ public class ConcurrentQueueTest {
                 producers.length,
                 recv == sent ? "PASS" : "FAIL");
         return recv == sent;
+        */
+
+        System.out.println("smallest: " + smallest +"\t");
+        System.out.print("biggest: " + biggest+"\t");
+        System.out.print("total: " + total + "\n");
+        return true;
     }
 }

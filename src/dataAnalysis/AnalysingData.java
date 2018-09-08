@@ -1,6 +1,8 @@
 package dataAnalysis;
 
 import dataAnalysis.ReadIn.ConcurrentQueueTest;
+import dataAnalysis.ReadIn.DirectBufferReadIn;
+import dataAnalysis.ReadIn.OneReadOneWrite;
 import dataAnalysis.ReadIn.ReadFile;
 import dataAnalysis.readSpeeds.*;
 
@@ -122,13 +124,19 @@ public class AnalysingData {
     }
 
     public void readIn(){
-        ReadFile readFile = new ReadFile();
-        readFile.readF(fx);
-        ConcurrentQueueTest concurrentQueueTest = new ConcurrentQueueTest(1, 1, fx);
-        concurrentQueueTest.run();
-        System.out.println("smallest: " + concurrentQueueTest.smallest);
-        System.out.println("biggest: " + concurrentQueueTest.biggest);
-        System.out.println("total: " + concurrentQueueTest.total);
+        //ReadFile readFile = new ReadFile();
+        //readFile.readF(fx);
+
+
+        long time = System.currentTimeMillis();
+        //ConcurrentQueueTest concurrentQueueTest = new ConcurrentQueueTest(10, 1, fx);
+        //concurrentQueueTest.run();
+        //System.out.println("time: concurrent: " + (System.currentTimeMillis() - time));
+
+        time = System.currentTimeMillis();
+        DirectBufferReadIn directBufferReadIn = new DirectBufferReadIn();
+        directBufferReadIn.run(fx);
+        System.out.println("\ntime: standard: " + (System.currentTimeMillis() - time));
     }
 
 }
