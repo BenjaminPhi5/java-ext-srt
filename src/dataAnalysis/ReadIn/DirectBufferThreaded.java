@@ -6,64 +6,84 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class DirectBufferThreaded {
 
-    int gSmallest = Integer.MAX_VALUE;
-    int gBiggest = 0;
-    int gTotal = 0;
-    Boolean lockBuff;
-    Boolean lockData;
-    FileInputStream fis;
+    byte[] buf1 = new byte[BUF_SIZE];
+    byte[] buf2 = new byte[BUF_SIZE];
+    int total = 0;
+    int biggest = 0;
+    int smallest = Integer.MAX_VALUE;
+    static final int BUF_SIZE = 1<<16;
+    static FileInputStream fis;
+    BufferReader thread1 = new BufferReader(1);
+    BufferReader thread2 = new BufferReader(2);
 
-    public class BufferProcessor extends Thread {
+    private class BufferReader extends Thread{
 
-        int total;
-        int smallest;
-        int biggest;
-        public void run() {
+        int index;
+        int smallest = Integer.MAX_VALUE;
+        int biggest = 0;
+        int total = 0;
+
+        BufferReader(int index){
+            this.index = index;
+        }
+
+        public  void run() {
             try {
-                byte buf[] = new byte[1 << 16];
+                int l_t = 0;
+                int l_s = Integer.MAX_VALUE;
+                int l_b = 0;
+                int cnt = 0;
                 int x;
                 int n;
-                synchronized (lockBuff) {
-                    n = fis.read(buf);
+                byte buf[];
+
+                if (index == 1)
+                    buf = buf1;
+                else
+                    buf = buf2;
+
+                while(true) {
+                    synchronized (buf1) {
+                        synchronized (buf2) {
+                            n = fis.read(buf);
+                        }
+                        buf1.notifyAll();
+                    }
+                    if(n==-1)
+                        break;
+
+                    for(int i = 0; i < n / 4; i++){
+                        x = (((int) buf[4*i+3]) & 255)
+                                |   ((((int) buf[4*i+2]) & 255) << 8)
+                                |   ((((int) buf[4*i+2]) & 255) << 16)
+                                |   ((((int) buf[4*i+2]) & 255) << 24);
+
+                        l_t ++;
+                        if(x > l_b)
+                            l_b = x;
+                        if(x < l_s)
+                            l_s = x;
+                    }
                 }
-                while (n != -1) {
+                total += l_t;
+                if(l_b > biggest)
+                    biggest = l_b;
+                if(l_s < smallest)
+                    smallest = l_s;
 
-                    for (int i = 0; i < n / 4; i++) {
-                        x = (((int) buf[4 * i + 3]) & 255)
-                                | ((((int) buf[4 * i + 2]) & 255) << 8)
-                                | ((((int) buf[4 * i + 2]) & 255) << 16)
-                                | ((((int) buf[4 * i + 2]) & 255) << 24);
-                        total++;
-                        if (x > biggest)
-                            biggest = x;
-                        if (x < smallest)
-                            smallest = x;
-                    }
-
-                    synchronized (lockData){
-                        gTotal += total;
-                        if (biggest > gBiggest)
-                            gBiggest = biggest;
-                        if (smallest < gSmallest)
-                            gSmallest = smallest;
-                    }
-
-                    synchronized (lockBuff) {
-                        n = fis.read(buf);
-                    }
-                }
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 System.err.println(e);
             }
         }
+
     }
 
-    public DirectBufferThreaded(String filename) {
-        lockBuff = true;
-        lockData = true;
+    public DirectBufferThreaded(String filename){
         try {
             fis = new FileInputStream(filename);
         } catch (FileNotFoundException e) {
@@ -71,31 +91,27 @@ public class DirectBufferThreaded {
         }
     }
 
-    public void run() {
-        ArrayList<BufferProcessor> processors = new ArrayList<>();
-        processors.add(new BufferProcessor());
-        processors.add(new BufferProcessor());
+    public void run(){
 
-        for(BufferProcessor p : processors){
-            p.start();
-        }
-
-        for(BufferProcessor p : processors){
-            try {
-                p.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
+        thread1.start();
+        thread2.start();
         try {
-            fis.close();
-        } catch (IOException e) {
+            thread1.join();
+            thread2.join();
+            total += thread1.total;
+            total += thread2.total;
+            if(thread1.biggest > biggest)
+                biggest = thread1.biggest;
+            if(thread2.biggest > biggest)
+                biggest = thread2.biggest;
+            if(thread1.smallest > smallest)
+                smallest = thread1.smallest;
+            if(thread2.smallest > smallest)
+                smallest = thread2.smallest;
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        //System.out.println("smallest: " + gSmallest + "\t");
-        //System.out.print("biggest: " + gBiggest + "\t");
-        //System.out.print("total: " + gTotal);
+
     }
 
 }

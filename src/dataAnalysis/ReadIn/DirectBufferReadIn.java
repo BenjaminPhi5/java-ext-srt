@@ -19,8 +19,10 @@ public class DirectBufferReadIn {
             int cnt = 0;
             int x;
             int n;
+            //long time = System.nanoTime();
             while ((n = fis.read(buf)) != -1) {
-
+                //System.out.println("time to read:    " + (System.nanoTime() - time));
+                //time = System.nanoTime();
                 for(int i = 0; i < n / 4; i++){
                     x = (((int) buf[4*i+3]) & 255)
                             |   ((((int) buf[4*i+2]) & 255) << 8)
@@ -33,12 +35,14 @@ public class DirectBufferReadIn {
                     if(x < smallest)
                         smallest = x;
                 }
+                //System.out.println("time to process: " + (System.nanoTime() - time));
+                //time = System.nanoTime();
 
             }
             fis.close();
-            System.out.println("smallest: " + smallest +"\t");
-            System.out.print("biggest: " + biggest+"\t");
-            System.out.print("total: " + total);
+            //System.out.println("smallest: " + smallest +"\t");
+            //System.out.print("biggest: " + biggest+"\t");
+            //System.out.print("total: " + total);
         }
         catch (IOException e) {
             System.err.println(e);
