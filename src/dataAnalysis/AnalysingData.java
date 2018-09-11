@@ -34,13 +34,19 @@ public class AnalysingData {
 
 
             //memoryAvailable();
-            //testIntegerValues();
+            //fileSizeEst(); //getting the file size takes no time at all. Noice.
+            testIntegerValues();
             //testBucketValues();
-            readIn();
+            //testLinearBuckets();
+            //readIn();
         }
 
     }
 
+    public void fileSizeEst(){
+        ReadFile readFile = new ReadFile();
+        readFile.readF(fx);
+    }
 
     public void testReadSpeed() throws IOException {
         // Tests read speeds of different reader inputs,
@@ -118,6 +124,11 @@ public class AnalysingData {
     public void testBucketValues() throws IOException{
         ByteArrayAndByteBuffer byteArrayAndByteBuffer = new ByteArrayAndByteBuffer();
         byteArrayAndByteBuffer.runBuckets(fx);
+    }
+
+    public void testLinearBuckets() throws IOException{
+        ByteArrayAndByteBuffer byteArrayAndByteBuffer = new ByteArrayAndByteBuffer();
+        byteArrayAndByteBuffer.runEvenBuckets(fx);
     }
 
     public void readIn(){
