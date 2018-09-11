@@ -1,4 +1,5 @@
 import dataAnalysis.AnalysingData;
+import dev.TestAlg;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -51,12 +52,17 @@ public class ExternalSort {
         String f1 = args[0];
         String f2 = args[1];
 
-        AnalysingData analysingData = new AnalysingData(f1, f2);
-        analysingData.run();
-        sort(f1, f2);
-        //System.out.println("test printing out a string");
-        MyExtraFile myExtraFile = new MyExtraFile();
-        myExtraFile.test();
-        System.out.println("The checksum is: "+checkSum(f1));
+        //AnalysingData analysingData = new AnalysingData(f1, f2);
+        //analysingData.run();
+
+        TestAlg testAlg = new TestAlg();
+        testAlg.run();
+
+        //sort(f1, f2);
+
+
+        //MyExtraFile myExtraFile = new MyExtraFile();
+        //myExtraFile.test();
+        //System.out.println("The checksum is: "+checkSum(f1));
     }
 }

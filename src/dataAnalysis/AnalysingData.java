@@ -38,7 +38,7 @@ public class AnalysingData {
             testIntegerValues();
             //testBucketValues();
             //testLinearBuckets();
-            //readIn();
+            readIn();
         }
 
     }
