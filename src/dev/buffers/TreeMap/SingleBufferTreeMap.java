@@ -1,4 +1,4 @@
-package dev.buffers;
+package dev.buffers.TreeMap;
 
 import dev.processors.HashTreeProcessor;
 import dev.processors.Processor;
@@ -68,7 +68,7 @@ public class SingleBufferTreeMap {
 
                     }
                 }
-                fis.close();
+                //fis.close();
             } catch (IOException e) { e.printStackTrace(); }
         }
 

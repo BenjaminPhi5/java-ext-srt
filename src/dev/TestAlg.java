@@ -1,6 +1,8 @@
 package dev;
 
-import dev.buffers.SingleBufferTreeMap;
+import dev.buffers.TreeMap.NoConcurrentTreeMap;
+import dev.buffers.TreeMap.SingleBufferTreeMap;
+import dev.buffers.TreeMap.WholeFileTreeMap;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -23,8 +25,6 @@ public class TestAlg {
 
 
             runLargeRange();
-
-            System.out.println("The checksum is: "+checkSum(fout)+"\n");
         }
 
         //FilePrinter fp = new FilePrinter();
@@ -38,10 +38,25 @@ public class TestAlg {
         long time;
 
         time= System.currentTimeMillis();
+        NoConcurrentTreeMap noConcurrentTreeMap = new NoConcurrentTreeMap(fin, fout);
+        noConcurrentTreeMap.run();
+        System.out.print("time NoConcurrentTreeMap: " + (System.currentTimeMillis()-time));
+        System.out.println("\tThe checksum is: "+checkSum(fout));
+
+        time= System.currentTimeMillis();
+        WholeFileTreeMap wholeFileTreeMap = new WholeFileTreeMap(fin, fout);
+        wholeFileTreeMap.run();
+        System.out.print("time WholeFileTreeMap: " + (System.currentTimeMillis()-time));
+        System.out.println("\tThe checksum is: "+checkSum(fout));
+
+        time= System.currentTimeMillis();
         SingleBufferTreeMap singleBuffer = new SingleBufferTreeMap(fin, fout);
         singleBuffer.run();
-        System.out.println("time SingleBufferTreeMap: " + (System.currentTimeMillis()-time));
+        System.out.print("time SingleBufferTreeMap: " + (System.currentTimeMillis()-time));
+        System.out.println("\tThe checksum is: "+checkSum(fout));
 
+
+        System.out.println();
     }
 
     public static String checkSum(String f) {
