@@ -10,6 +10,8 @@ public class HashTreeProcessor extends Processor {
         values = new TreeMap<>();
     }
 
+    public HashTreeProcessor(boolean x){}
+
     public TreeMap<Integer, Byte> getValues(){
         return values;
     }
