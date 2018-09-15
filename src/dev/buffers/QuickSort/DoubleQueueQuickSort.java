@@ -1,29 +1,31 @@
-package dev.buffers;
-
-import dev.processors.HashTreeProcessor;
+package dev.buffers.QuickSort;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Function;
 
-public class BaseToWorkFrom {
+public class DoubleQueueQuickSort {
 
     // Using two concurrent linked queues.
     // When done, put a a byte array of length 1 on the queue, as no integer byte arrays are of length one;
     // Then, use the code from the concurrent linked queue and see if it works. nice.
 
     ConcurrentLinkedQueue<byte[]> inQueue;
-    ConcurrentLinkedQueue<HashTreeProcessor> processQueue;
+    ConcurrentLinkedQueue<ArrayList<Integer>> processQueue;
     ConcurrentLinkedQueue<byte[]> outQueue;
     //Boolean writeStart;
     String fIn;
     String fOut;
-    HashTreeProcessor endProcessor;
+    ArrayList<Integer> endProcessor;
     private static final int BUF_SIZE = 1 << 16;
     private static final byte NO_BUFFERS = 15; // replace the 5 in code with the no of buffers if nessesary
     // NOTE if code doesnt work may need to increase No_Buffers
@@ -63,7 +65,7 @@ public class BaseToWorkFrom {
                         inQueue.offer(lastBuf);
                     }
 
-                    buf = new byte[BUF_SIZE];
+                    //buf = new byte[BUF_SIZE];
                     //index = (index+1)%NO_BUFFERS;
                     //buf = buffers[index];
 
@@ -86,9 +88,9 @@ public class BaseToWorkFrom {
 
         public void run(){
             byte[] buf;
-            HashTreeProcessor processor = new HashTreeProcessor();
-            Function<Integer, Boolean> neg = x -> (x <= 0); Function<Integer, Boolean> pos = x -> (x > 0);
-            Function<Integer, Boolean> f = neg;
+            ArrayList<Integer> processor = new ArrayList<>();
+            Function<Byte, Boolean> neg = x -> (x <= 0); Function<Byte, Boolean> pos = x -> (x > 0);
+            Function<Byte, Boolean> f = neg;
             long time;
 
             while ((buf = inQueue.poll()) == null || buf.length!= 2) {
@@ -103,7 +105,7 @@ public class BaseToWorkFrom {
                             */
 
                         processQueue.offer(processor);
-                        processor = new HashTreeProcessor();
+                        processor = new ArrayList<>();
                         f = pos;
                     } else {
                         time = System.nanoTime();
@@ -118,20 +120,23 @@ public class BaseToWorkFrom {
             inQueue.offer(new byte[2]);
         }
 
-        public void update(byte[] buf, HashTreeProcessor p, Function<Integer, Boolean> f) {
+        public void update(byte[] buf, ArrayList<Integer> p, Function<Byte, Boolean> f) {
             //System.out.println("start buffer");
-            int n = buf.length/4; int x;
-            for (int i = 0; i < n; i++) {
-                x = (((int) buf[4 * i + 3]) & 255)
-                        | ((((int) buf[4 * i + 2]) & 255) << 8)
-                        | ((((int) buf[4 * i + 1]) & 255) << 16)
-                        | ((((int) buf[4 * i]) & 255) << 24);
-                //System.out.print(", " + x);
-                if (f.apply(x)) {
+            //int n = buf.length/4;
+            int n = buf.length;
+            int x;
+            for(int i = 0; i < n; i+= 4) {
+
+                if(f.apply(buf[i])) {
+
+                    x = (((int) buf[i + 3]) & 255)
+                            | ((((int) buf[i + 2]) & 255) << 8)
+                            | ((((int) buf[i + 1]) & 255) << 16)
+                            | ((((int) buf[i]) & 255) << 24);
                     p.add(x);
                 }
+
             }
-            //System.out.println("\nend buffer");
         }
 
     }
@@ -149,7 +154,7 @@ public class BaseToWorkFrom {
             */
 
 
-            HashTreeProcessor p;
+            ArrayList<Integer> p;
             while ((p = processQueue.poll()) == null || p != endProcessor) {
                 if (p != null) {
                     outputBuffers(p);
@@ -162,29 +167,31 @@ public class BaseToWorkFrom {
 
         }
 
-        public void outputBuffers(HashTreeProcessor p){
-            TreeMap<Integer, Byte> values = p.getValues(); int r; byte[] result = new byte[4];
-            Map.Entry<Integer, Byte> x = values.pollFirstEntry(); int index = 0;
-            byte[] buf = new byte[BUF_SIZE];  int bufSize = 0;
-            while (x != null){
-                r = x.getKey();
-                result[0] = (byte) (r >> 24); result[1] = (byte) (r >> 16);
-                result[2] = (byte) (r >> 8); result[3] = (byte) (r);
-                for(int i = 0; i < x.getValue(); i++) {
-                    buf[bufSize] = result[0]; buf[1+bufSize] = result[1]; buf[2+bufSize] = result[2]; buf[3+bufSize] = result[3];
-                    bufSize+= 4;
-                    if (bufSize == BUF_SIZE) {
-                        bufSize = 0;
-                        outQueue.offer(buf);
-                        buf = new byte[BUF_SIZE];
-                    }
-                }
-                x = values.pollFirstEntry();
+        public void outputBuffers(ArrayList<Integer> p){
 
+            Collections.sort(p);
+            byte[] buf = new byte[BUF_SIZE];
+            int index = 0;
+
+            for(int i : p) {
+
+                buf[index] = (byte) (i >> 24);
+                buf[index + 1] = (byte) (i >> 16);
+                buf[index + 2] = (byte) (i >> 8);
+                buf[index + 3] = (byte) (i);
+
+                index += 4;
+
+                if (index == BUF_SIZE) {
+                    outQueue.offer(buf);
+                    index = 0;
+                    buf = new byte[BUF_SIZE];
+                }
             }
-            if(bufSize > 0) {
-                byte[] bufE = new byte[bufSize]; //copy the last buffer, probably smaller than bufsize, to the file.
-                for (int i = 0; i < bufSize; i++) {
+
+            if(index > 0) {
+                byte[] bufE = new byte[index]; //copy the last buffer, probably smaller than bufsize, to the file.
+                for (int i = 0; i < index; i++) {
                     bufE[i] = buf[i];
                 }
                 outQueue.offer(bufE);
@@ -224,13 +231,13 @@ public class BaseToWorkFrom {
 
     }
 
-    public BaseToWorkFrom(String f1, String f2) {
+    public DoubleQueueQuickSort(String f1, String f2) {
         fIn = f1;
         fOut = f2;
         inQueue = new ConcurrentLinkedQueue<>();
         processQueue = new ConcurrentLinkedQueue<>();
         outQueue = new ConcurrentLinkedQueue<>();
-        endProcessor = new HashTreeProcessor(false);
+        endProcessor = new ArrayList<>();
         //writeStart = false;
 
     }
@@ -267,3 +274,4 @@ public class BaseToWorkFrom {
     }
 
 }
+

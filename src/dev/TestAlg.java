@@ -1,5 +1,7 @@
 package dev;
 
+import dev.buffers.QuickSort.DoubleBufferQuickSort;
+import dev.buffers.QuickSort.DoubleQueueQuickSort;
 import dev.buffers.TreeMap.*;
 import dev.processors.HashTreeProcessor;
 
@@ -17,16 +19,18 @@ public class TestAlg {
 
     public void run(){
 
-        for(int i = 16; i <= 16; i++){
+        for(int i = 13; i <= 17; i++){
             fin = "test-suite/test" + i + "a.dat";
             fout = "test-suite/test" + i + "b.dat";
             System.out.println("TEST: " + i);
+            System.out.println(checkSum(fout)); System.out.println();
 
 
             //runLargeRange();
-            doubleBufferTest();
+            //doubleBufferTest();
 
             //try { printFile("test-suite/test" + i + "a.dat"); } catch (IOException e) { e.printStackTrace(); }
+            //System.out.println("---");
             //try { printFile("test-suite/test" + i + "b.dat"); } catch (IOException e) { e.printStackTrace(); }
         }
 
@@ -66,11 +70,26 @@ public class TestAlg {
     }
 
     private void doubleBufferTest(){
-        for(int i = 0; i < 2; i++) {
+        for(int i = 0; i < 1; i++) {
+/*
             long time = System.currentTimeMillis();
             DoubleQueueTreeMap doubleQueueTreeMap = new DoubleQueueTreeMap(fin, fout);
             doubleQueueTreeMap.run();
             System.out.print("time DoubleQueueTreeMap: " + (System.currentTimeMillis() - time));
+            System.out.println("\tThe checksum is: " + checkSum(fout));
+*/
+/*
+            long time = System.currentTimeMillis();
+            DoubleQueueQuickSort doubleQueueQuickSort = new DoubleQueueQuickSort(fin, fout);
+            doubleQueueQuickSort.run();
+            System.out.print("time DoubleQuickSort: " + (System.currentTimeMillis() - time));
+            System.out.println("\tThe checksum is: " + checkSum(fout));
+            */
+
+            long time = System.currentTimeMillis();
+            DoubleBufferQuickSort doubleQueueQuickSort = new DoubleBufferQuickSort();
+            try { doubleQueueQuickSort.run(fin, fout); } catch (IOException e) { e.printStackTrace(); }
+            System.out.print("time DoubleQuickSort: " + (System.currentTimeMillis() - time));
             System.out.println("\tThe checksum is: " + checkSum(fout));
         }
     }

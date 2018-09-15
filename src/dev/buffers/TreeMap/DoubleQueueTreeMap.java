@@ -68,9 +68,9 @@ public class DoubleQueueTreeMap {
                     //buf = buffers[index];
 
 
-                    time = System.nanoTime();
+                    //time = System.nanoTime();
                     try { n = fis.read(buf); } catch (IOException e) { e.printStackTrace(); }
-                    System.out.println("r time: " + (System.nanoTime() - time));
+                    //System.out.println("r time: " + (System.nanoTime() - time));
 
 
                 }
@@ -87,8 +87,8 @@ public class DoubleQueueTreeMap {
         public void run(){
             byte[] buf;
             HashTreeProcessor processor = new HashTreeProcessor();
-            Function<Integer, Boolean> neg = x -> (x <= 0); Function<Integer, Boolean> pos = x -> (x > 0);
-            Function<Integer, Boolean> f = neg;
+            Function<Byte, Boolean> neg = x -> (x <= 0); Function<Byte, Boolean> pos = x -> (x > 0);
+            Function<Byte, Boolean> f = neg;
             long time;
 
             while ((buf = inQueue.poll()) == null || buf.length!= 2) {
@@ -106,9 +106,9 @@ public class DoubleQueueTreeMap {
                         processor = new HashTreeProcessor();
                         f = pos;
                     } else {
-                        time = System.nanoTime();
+                        //time = System.nanoTime();
                         update(buf, processor, f);
-                        System.out.println("p time: " + (System.nanoTime() - time));
+                        //System.out.println("p time: " + (System.nanoTime() - time));
                     }
 
                 } else {
@@ -118,20 +118,23 @@ public class DoubleQueueTreeMap {
             inQueue.offer(new byte[2]);
         }
 
-        public void update(byte[] buf, HashTreeProcessor p, Function<Integer, Boolean> f) {
+        public void update(byte[] buf, HashTreeProcessor p, Function<Byte, Boolean> f) {
             //System.out.println("start buffer");
-            int n = buf.length/4; int x;
-            for (int i = 0; i < n; i++) {
-                x = (((int) buf[4 * i + 3]) & 255)
-                        | ((((int) buf[4 * i + 2]) & 255) << 8)
-                        | ((((int) buf[4 * i + 1]) & 255) << 16)
-                        | ((((int) buf[4 * i]) & 255) << 24);
-                //System.out.print(", " + x);
-                if (f.apply(x)) {
+            //int n = buf.length/4;
+            int n = buf.length;
+            int x;
+            for(int i = 0; i < n; i+= 4) {
+
+                if(f.apply(buf[i])) {
+
+                    x = (((int) buf[i + 3]) & 255)
+                            | ((((int) buf[i + 2]) & 255) << 8)
+                            | ((((int) buf[i + 1]) & 255) << 16)
+                            | ((((int) buf[i]) & 255) << 24);
                     p.add(x);
                 }
+
             }
-            //System.out.println("\nend buffer");
         }
 
     }

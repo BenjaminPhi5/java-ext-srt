@@ -35,10 +35,11 @@ public class AnalysingData {
 
             //memoryAvailable();
             //fileSizeEst(); //getting the file size takes no time at all. Noice.
-            testIntegerValues();
+            //testIntegerValues();
             //testBucketValues();
-            //testLinearBuckets();
-            readIn();
+            testLinearBuckets();
+            //getSmallestRange();
+
         }
 
     }
@@ -146,6 +147,11 @@ public class AnalysingData {
         DirectBufferReadIn directBufferReadIn = new DirectBufferReadIn();
         directBufferReadIn.run(fx);
         System.out.println("\ntime: standard: " + (System.currentTimeMillis() - time));
+    }
+
+    public void getSmallestRange() throws IOException{
+        ByteArrayAndByteBuffer byteArrayAndByteBuffer = new ByteArrayAndByteBuffer();
+        byteArrayAndByteBuffer.getSmallestRange("test-suite/test" + 17 + "b.dat");
     }
 
 }

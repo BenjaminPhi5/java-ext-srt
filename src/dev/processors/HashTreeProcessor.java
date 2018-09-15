@@ -1,9 +1,11 @@
 package dev.processors;
 
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 public class HashTreeProcessor extends Processor {
 
+    Byte current;
     private TreeMap<Integer, Byte> values;
 
     public  HashTreeProcessor(){
@@ -23,7 +25,7 @@ public class HashTreeProcessor extends Processor {
         //values.replace(x, currentValue, (byte)(currentValue+1));
 
 
-        Byte current = values.put(x, (byte)1);
+        current = values.put(x, (byte)1);
         if(current != null){
             values.put(x, (byte)(current+1));
         }

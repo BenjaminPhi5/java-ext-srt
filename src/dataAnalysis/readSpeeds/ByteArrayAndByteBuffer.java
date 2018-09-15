@@ -297,5 +297,41 @@ public class ByteArrayAndByteBuffer {
 
     }
 
+    public void getSmallestRange(String f1) throws IOException {
+
+        try {
+            RandomAccessFile f = new RandomAccessFile(f1, "rw");
+            int range = Integer.MAX_VALUE;
+
+            byte[] buffer = new byte[BUFFER_SIZE];
+            int bytesRead = f.read(buffer);
+
+            while(bytesRead != -1){
+                if(bytesRead > BUFFER_SIZE){
+                    System.out.println("boi you got an error here, you need to cap the amount it reads in okay");
+                }
+
+                ByteBuffer wrapped = ByteBuffer.wrap(buffer);
+                int prev = wrapped.getInt(); int x;
+                for(int i = 0; i < bytesRead/4 -1; i++){
+                    x = wrapped.getInt();
+                    if(x - prev < range && x!=prev){
+                        range = x-prev;
+                    }
+                    prev = x;
+                }
+
+                bytesRead = f.read(buffer);
+
+            }
+            System.out.println("smallest range: " + range);
+
+        } catch (EOFException e){
+            //I dont think this catch needs to be in anymore wont happen due to while loop
+            System.out.println("end of file error not handled");
+            return;
+        }
+    }
+
 
 }
