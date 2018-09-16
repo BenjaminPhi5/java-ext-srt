@@ -3,24 +3,24 @@ package dev.buffers.experimenting;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 
-public class CountingSort {
-
-    FileInputStream fis;
-    FileOutputStream fos;
+public class CountingSortShorts {
+    RandomAccessFile fis;
+    RandomAccessFile fos;
     public static final int BUF_SIZE = 1<<16;
     public static final int ARR_SIZE = 1000;
 
     public void run(String fin, String fout){
 
-        int[] arr = new int[ARR_SIZE];
+        short[] arr = new short[ARR_SIZE];
         int n; int bytesRead; int x;
         byte[] buf = new byte[BUF_SIZE];
         //short one = 1;
 
 
         try {
-            fis = new FileInputStream(fin);
+            fis = new RandomAccessFile(fin, "r");
 
             while ((n = fis.read(buf)) != -1) {
                 bytesRead = n / 4;
@@ -31,18 +31,19 @@ public class CountingSort {
                             | ((((int) buf[4 * i + 1]) & 255) << 16)
                             | ((((int) buf[4 * i]) & 255) << 24);
 
-                    arr[x] = (arr[x]+1);
+                    arr[x] = ++arr[x];
                 }
             }
             //fis.close();
 
 
-            fos = new FileOutputStream(fout);
+            fos = new RandomAccessFile(fout, "w");
             int i; int j; int loc = 0;
             byte b1; byte b2; byte b3; byte b4;
 
             for(i = 0; i < arr.length; i++){
-                x = arr[i];
+                x = Short.toUnsignedInt(arr[i]);
+                if(x < 0)
                 if(x > 0) {
                     b1 = (byte) (i >> 24); b2 = (byte) (i >> 16); b3 = (byte) (i >> 8); b4 = (byte) (i);
                     for (j = 0; j < x; j++) {
@@ -77,7 +78,7 @@ public class CountingSort {
 
 
     public static void main(String[] args){
-        CountingSort countingSort = new CountingSort();
+        CountingSortInts countingSort = new CountingSortInts();
 
         long time;
         time = System.currentTimeMillis();
