@@ -85,7 +85,8 @@ public class testSort {
             }
 
             if(index > 0) {
-                Arrays.sort(ints, 0, index);
+                //Arrays.sort(ints, 0, index);
+                qSort(ints, 0, index);
             }
 
 
@@ -112,4 +113,41 @@ public class testSort {
 
     }
 
+    private void insSort(int arr[], int start, int end){
+        int i = start + 1; int j; int temp;
+        while(i < end){
+            j = i;
+            while(j > start && arr[j-1] > arr[j]){
+                temp = arr[j-1]; arr[j-1] = arr[j]; arr[j] = temp;
+                j = j-1;
+            }
+            i = i+1;
+        }
+
+    }
+
+    private void qSort(int[] arr, int start, int end){
+
+        if(end-start <= 27){
+            insSort(arr,start, end);
+            return;
+        }
+
+        int pivot = arr[start + (end-start)/2];
+        int l = start; int r = end; int temp;
+        while(l <= r) {
+            while(l <= end && arr[l] < pivot)
+                l++;
+            while(r >= 0 && arr[r] > pivot)
+                r--;
+            if(l <= r){
+                temp = arr[l]; arr[l] = arr[r]; arr[r] = temp;
+                l++; r--;
+            }
+        }
+        if(start < r)
+            qSort(arr, start, r);
+        if(end > l)
+            qSort(arr, l, end);
+    }
 }
