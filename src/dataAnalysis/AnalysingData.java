@@ -35,9 +35,9 @@ public class AnalysingData {
 
             //memoryAvailable();
             //fileSizeEst(); //getting the file size takes no time at all. Noice.
-            //testIntegerValues();
+            testIntegerValues();
             //testBucketValues();
-            testLinearBuckets();
+            //testLinearBuckets();
             //getSmallestRange();
 
         }
