@@ -27,6 +27,7 @@ public class AnalysingData {
 
         for(int i = 1; i <= 17; i++){
             fx = "test-suite/test" + i + "a.dat";
+            f2 = "test-suite/test" + i + "b.dat";
             System.out.println("\nTEST " + i);
             //testReadSpeed();
             // I CONCLUDED byte array byte buffer was fastest, may need to check the method used,
@@ -35,10 +36,11 @@ public class AnalysingData {
 
             //memoryAvailable();
             //fileSizeEst(); //getting the file size takes no time at all. Noice.
-            testIntegerValues();
+            //testIntegerValues();
             //testBucketValues();
             //testLinearBuckets();
             //getSmallestRange();
+            getCulmativeBoundaries();
 
         }
 
@@ -152,6 +154,11 @@ public class AnalysingData {
     public void getSmallestRange() throws IOException{
         ByteArrayAndByteBuffer byteArrayAndByteBuffer = new ByteArrayAndByteBuffer();
         byteArrayAndByteBuffer.getSmallestRange("test-suite/test" + 17 + "b.dat");
+    }
+
+    public void getCulmativeBoundaries() throws IOException{
+        ByteArrayAndByteBuffer byteArrayAndByteBuffer = new ByteArrayAndByteBuffer();
+        byteArrayAndByteBuffer.culmfreqBoundaries(f2);
     }
 
 }

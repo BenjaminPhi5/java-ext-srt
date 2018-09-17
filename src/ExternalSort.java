@@ -52,8 +52,8 @@ public class ExternalSort {
         String f1 = args[0];
         String f2 = args[1];
 
-        //AnalysingData analysingData = new AnalysingData(f1, f2);
-        //analysingData.run();
+        AnalysingData analysingData = new AnalysingData(f1, f2);
+        analysingData.run();
 
         TestAlg testAlg = new TestAlg();
         testAlg.run();

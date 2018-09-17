@@ -9,9 +9,23 @@ import java.util.Arrays;
 
 public class testSort {
 
-    public static final int bound = 536870912;
+    //public static final int bound = 536870912;
     //public static final int sizeP = Integer.MAX_VALUE/3;
     //public static final int size = (Integer.MIN_VALUE/3);
+
+
+    public static final int b0 = Integer.MIN_VALUE;
+    public static final int b1 = -1417140587;
+    public static final int b2 = -687496445;
+    public static final int b3 = 43169891;
+    public static final int b4 = 773465171;
+    public static final int b5 = 1503894278;
+    public static final int b6 = Integer.MAX_VALUE;
+    //public static final int b7 = 0;
+    //public static final int b8 = 0;
+
+
+/*
     public static final int b0 = Integer.MIN_VALUE;
     public static final int b1 = b0 + bound;
     public static final int b2 = b1+ bound;
@@ -21,6 +35,7 @@ public class testSort {
     public static final int b6 =  b5+bound;
     public static final int b7 = b6+bound;
     public static final int b8 = Integer.MAX_VALUE;
+*/
 
     public static final int BUF_SIZE = 1<<16;
 
@@ -32,7 +47,8 @@ public class testSort {
 
         long time;
         time = System.currentTimeMillis();
-        testSort.run("test-suite/test" + 17 + "a.dat", "test-suite/test" + 17 + "b.dat");
+        int test = 17;
+        testSort.run("test-suite/test" + test + "a.dat", "test-suite/test" + test + "b.dat");
         System.out.println("time: " + (System.currentTimeMillis() - time));
 
     }
@@ -40,37 +56,38 @@ public class testSort {
 
     public  void run(String filename, String fOut) {
 
-        int[] ints = new int[1800000];
+        int[] ints = new int[1750000];
         byte buf[] = new byte[BUF_SIZE];
         int boundlower = 0;
         int boundupper = 0;
-        int n;
+        int n; //int i;
         int bytesRead;
         int index = 0;
         int x; int loc;
         try { fos = new FileOutputStream(fOut); } catch (FileNotFoundException e) { e.printStackTrace(); }
 
-        for (int j = 0; j < 8; j++) {
+        for (int j = 0; j < 6; j++) {
             index = 0;
 
             switch (j) {
                 case 0: boundlower = b0; boundupper = b1;break; case 1: boundlower = b1 + 1;boundupper = b2;break;
                 case 2: boundlower = b2 + 1;boundupper = b3;break; case 3: boundlower = b3 + 1;boundupper = b4;break;
                 case 4: boundlower = b4 + 1;boundupper = b5;break;case 5: boundlower = b5 + 1;boundupper = b6;break;
-                case 6: boundlower = b6 + 1;boundupper = b7;break;case 7: boundlower = b7 + 1;boundupper = b8;break;
+                //case 6: boundlower = b6 + 1;boundupper = b7; break;//case 7: boundlower = b7 + 1;boundupper = b8;break;
             }
 
             try {
                 fis = new FileInputStream(filename);
+                int pos;
 
                 while ((n = fis.read(buf)) != -1) {
                     bytesRead = n / 4;
                     for (int i = 0; i < bytesRead; i++) {
-
-                        x = (((int) buf[4 * i + 3]) & 255)
-                                | ((((int) buf[4 * i + 2]) & 255) << 8)
-                                | ((((int) buf[4 * i + 1]) & 255) << 16)
-                                | ((((int) buf[4 * i]) & 255) << 24);
+                        pos = 4*i;
+                        x = (((int) buf[pos+ 3]) & 255)
+                                | ((((int) buf[pos + 2]) & 255) << 8)
+                                | ((((int) buf[pos + 1]) & 255) << 16)
+                                | ((((int) buf[pos]) & 255) << 24);
 
                         if (boundlower <= x && x <= boundupper) {
                             //System.out.println("x: "+ x);
@@ -85,8 +102,8 @@ public class testSort {
             }
 
             if(index > 0) {
-                //Arrays.sort(ints, 0, index);
-                qSort(ints, 0, index);
+                Arrays.sort(ints, 0, index);
+                //qSort(ints, 0, index);
             }
 
 

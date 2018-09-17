@@ -4,46 +4,47 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 
 public class CountingSortShorts {
-    RandomAccessFile fis;
-    RandomAccessFile fos;
+    FileInputStream fis;
+    FileOutputStream fos;
     public static final int BUF_SIZE = 1<<16;
     public static final int ARR_SIZE = 1000;
 
     public void run(String fin, String fout){
 
         short[] arr = new short[ARR_SIZE];
-        int n; int bytesRead; int x;
+        int n; int bytesRead; int x; int pos;
         byte[] buf = new byte[BUF_SIZE];
         //short one = 1;
 
 
         try {
-            fis = new RandomAccessFile(fin, "r");
+            fis = new FileInputStream(fin);
 
             while ((n = fis.read(buf)) != -1) {
                 bytesRead = n / 4;
                 for (int i = 0; i < bytesRead; i++) {
+                    pos = 4*i;
 
-                    x = (((int) buf[4 * i + 3]) & 255)
-                            | ((((int) buf[4 * i + 2]) & 255) << 8)
-                            | ((((int) buf[4 * i + 1]) & 255) << 16)
-                            | ((((int) buf[4 * i]) & 255) << 24);
+                    x = (((int) buf[pos + 3]) & 255)
+                            | ((((int) buf[pos + 2]) & 255) << 8)
+                            | ((((int) buf[pos + 1]) & 255) << 16)
+                            | ((((int) buf[pos]) & 255) << 24);
 
-                    arr[x] = ++arr[x];
+                    arr[x] = (short)(arr[x]+1);
                 }
             }
             //fis.close();
 
 
-            fos = new RandomAccessFile(fout, "w");
+            fos = new FileOutputStream(fout);
             int i; int j; int loc = 0;
             byte b1; byte b2; byte b3; byte b4;
 
             for(i = 0; i < arr.length; i++){
                 x = Short.toUnsignedInt(arr[i]);
-                if(x < 0)
                 if(x > 0) {
                     b1 = (byte) (i >> 24); b2 = (byte) (i >> 16); b3 = (byte) (i >> 8); b4 = (byte) (i);
                     for (j = 0; j < x; j++) {

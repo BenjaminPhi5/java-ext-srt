@@ -19,7 +19,7 @@ public class TestAlg {
 
     public void run(){
 
-        for(int i = 11; i <= 11; i++){
+        for(int i = 13; i <= 17; i++){
             fin = "test-suite/test" + i + "a.dat";
             fout = "test-suite/test" + i + "b.dat";
             System.out.println("TEST: " + i);

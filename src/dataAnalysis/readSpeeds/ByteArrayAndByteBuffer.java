@@ -333,5 +333,54 @@ public class ByteArrayAndByteBuffer {
         }
     }
 
+    public void culmfreqBoundaries(String f1) throws IOException {
+
+        try {
+            RandomAccessFile f = new RandomAccessFile(f1, "rw");
+            int index = 0; int boundary = 0; int inc = 1700000; int x = 0;
+            int max = 0;
+
+            byte[] buffer = new byte[BUFFER_SIZE];
+            int bytesRead = f.read(buffer);
+
+            while (bytesRead != -1) {
+                if (bytesRead > BUFFER_SIZE) {
+                    System.out.println("boi you got an error here, you need to cap the amount it reads in okay");
+                }
+
+                ByteBuffer wrapped = ByteBuffer.wrap(buffer);
+                for (int i = 0; i < bytesRead / 4; i++) {
+
+                    x = wrapped.getInt();
+                    if(x > max){
+                        max=x;
+                    }
+
+                    if (index == boundary || index == 10000000) {
+                        System.out.println("bound = " + x);
+                        boundary += inc;
+                    }
+
+                    index++;
+
+                }
+
+
+                bytesRead = f.read(buffer);
+
+            }
+            System.out.println("bound = " + x);
+            System.out.println("max: " + max);
+            System.out.println("done. first and last boundaries should be around the integer max and min i imagine");
+            System.out.println("int max = " + Integer.MAX_VALUE + "\tint min = " + Integer.MIN_VALUE);
+
+        } catch (EOFException e) {
+            //I dont think this catch needs to be in anymore wont happen due to while loop
+            System.out.println("end of file error not handled");
+            return;
+
+        }
+    }
+
 
 }
