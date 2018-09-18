@@ -3,22 +3,24 @@ package dev.buffers.experimenting;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
 
 public class CountingSortShorts {
 
     public static final int BUF_SIZE = 1<<16;
     public static final int ARR_SIZE = 1000;
+    private static short[] arr;
+    private static byte[] buf;
 
     public static final void run(String fin, String fout){
 
         FileInputStream fis;
         FileOutputStream fos;
 
-        short[] arr = new short[ARR_SIZE];
+        //short[] arr = new short[ARR_SIZE];
+        arr = new short[ARR_SIZE];
         int n; int bytesRead; int x; int pos;
-        byte[] buf = new byte[BUF_SIZE];
+        //byte[] buf = new byte[BUF_SIZE];
+        buf = new byte[BUF_SIZE];
 
         try {
             fis = new FileInputStream(fin);
@@ -28,11 +30,18 @@ public class CountingSortShorts {
                 for (int i = 0; i < bytesRead; i++) {
                     pos = 4*i;
 
+                    /*
                     x = (((int) buf[pos + 3]) & 255)
                             | ((((int) buf[pos + 2]) & 255) << 8)
                             | ((((int) buf[pos + 1]) & 255) << 16)
                             | ((((int) buf[pos]) & 255) << 24);
 
+                    arr[x] = (short)(arr[x]+1);
+                    */
+                    x = (((int)buf[pos]) & 255) << 24
+                            | ((((int) buf[pos + 1]) & 255) << 16)
+                            | ((((int) buf[pos + 2]) & 255) << 8)
+                            | ((((int) buf[pos + 3]) & 255));
                     arr[x] = (short)(arr[x]+1);
                 }
             }
@@ -73,7 +82,8 @@ public class CountingSortShorts {
             System.err.println(e);
         }
 
-
+        arr = null;
+        buf = null;
 
     }
 

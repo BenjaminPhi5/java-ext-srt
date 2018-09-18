@@ -21,7 +21,7 @@ public class ExternalSort {
         if(l<2)
             return;
         else if(l < 100){
-            dev.buffers.experimenting.testSort.run(f1, f2, false);
+            dev.buffers.experimenting.SingleReadSort.run(f1, f2);
         } else {
             // read in first 10 values, see what theyre like. depending, get counting sort
             int max = range(fis);
@@ -31,10 +31,10 @@ public class ExternalSort {
             } else{
                 // if size less than 6 mb, read in whole file once, else do 6 way split.
                 if(l <= 6000000) {
-                    dev.buffers.experimenting.testSort.run(f1, f2, false);
+                    dev.buffers.experimenting.AdaptiveSort.run(f1, f2, false, l);
                 }
                 else {
-                    dev.buffers.experimenting.testSort.run(f1, f2, true);
+                    dev.buffers.experimenting.AdaptiveSort.run(f1, f2, true, l);
                 }
             }
         }
@@ -50,10 +50,10 @@ public class ExternalSort {
         for (int i = 0; i < bytesRead; i++) {
             pos = 4 * i;
 
-            x = (((int) buf[pos + 3]) & 255)
-                    | ((((int) buf[pos + 2]) & 255) << 8)
+            x = (((int)buf[pos]) & 255) << 24
                     | ((((int) buf[pos + 1]) & 255) << 16)
-                    | ((((int) buf[pos]) & 255) << 24);
+                    | ((((int) buf[pos + 2]) & 255) << 8)
+                    | ((((int) buf[pos + 3]) & 255));
 
             if(x > max)
                 max = x;
@@ -104,14 +104,16 @@ public class ExternalSort {
         //AnalysingData analysingData = new AnalysingData(f1, f2);
         //analysingData.run();
 
-        //TestAlg testAlg = new TestAlg();
-        //testAlg.run();
-
         long time; time = System.currentTimeMillis();
         for(int i = 1; i <= 17; i++){
+            System.out.println("test: " + i);
             sort("test-suite/test" + i + "a.dat", "test-suite/test" + i + "b.dat");
         }
         System.out.println("time: "+ (System.currentTimeMillis() - time));
+
+        TestAlg testAlg = new TestAlg();
+        testAlg.run();
+
         //sort(f1, f2);
 
     }

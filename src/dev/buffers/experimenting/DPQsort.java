@@ -2,6 +2,7 @@ package dev.buffers.experimenting;
 
 public class DPQsort {
 
+
     public static final void dpQsort(int arr[], int start, int end) {
         int p; int q; int temp;
 
@@ -63,6 +64,7 @@ public class DPQsort {
 
         //recursively call the quick sort now
         //System.out.print("before: " + j + ", " + g);
+
         dpQsort(arr, start, l-2);
         //System.out.println("after: " + j + ", " + g);
         dpQsort(arr, l, g);
@@ -70,7 +72,5 @@ public class DPQsort {
 
     }
 
-    private static void swap(int[] a, int i, int j) {
-        int temp = a[i];a[i] = a[j];a[j] = temp;
-    }
+
 }

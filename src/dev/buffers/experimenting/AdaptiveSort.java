@@ -1,45 +1,44 @@
 package dev.buffers.experimenting;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Arrays;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 
+public class AdaptiveSort {
 
-public class testSort {
-
-    public static final int b0 = Integer.MIN_VALUE;
-    public static final int b1 = -1417140587;
-    public static final int b2 = -687496445;
-    public static final int b3 = 43169891;
-    public static final int b4 = 773465171;
-    public static final int b5 = 1503894278;
-    public static final int b6 = Integer.MAX_VALUE;
+    private static int[] ints;
+    private static byte[] buf;
 
     public static final int BUF_SIZE = 1 << 16;
-    public static final int NO_INTS = 1750000;
-    //public static final int NO_INTS = 4000000;
+    public static final double R = 0.837;
 
     public static void main(String[] args) {
-        testSort testSort = new testSort();
+        AdaptiveSort adaptiveSort = new AdaptiveSort();
 
         long time;
         time = System.currentTimeMillis();
         int test = 17;
-        testSort.run("test-suite/test" + test + "a.dat", "test-suite/test" + test + "b.dat", true);
+        //adaptiveSort.run("test-suite/test" + test + "a.dat", "test-suite/test" + test + "b.dat", true);
         System.out.println("time: " + (System.currentTimeMillis() - time));
 
     }
 
 
-    public static final void run(String filename, String fOut, boolean multRead) {
+    public static final void run(String filename, String fOut, boolean multRead, long length) {
+
+        // need to get the amount of memory and also say the filesize and try working things out that way.
+        // work out the amount of boundaries needed, and then add one more.
+        // so filesize / max possible buffer size;
 
         RandomAccessFile fis;
         RandomAccessFile fos = null;
         File a = new File(filename); File b = new File(fOut);
+        ForkJoinQsort sorter;
 
-        int[] ints = new int[NO_INTS];
-        byte buf[] = new byte[BUF_SIZE];
+
+        //byte buf[] = new byte[BUF_SIZE];
+        buf = new byte[BUF_SIZE];
         int boundlower = 0;
         int boundupper = 0;
         int n; //int i;
@@ -47,43 +46,53 @@ public class testSort {
         int index = 0;
         int x;
         int loc;
+        //int[] ints;
+
+        int bound = 0;
+
         try {
             fos = new RandomAccessFile(b, "rw");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
 
-        int runs = (multRead) ? 6 : 1;
+        //System.gc();
+        Runtime r = Runtime.getRuntime();
+        double free = r.freeMemory()*R;
+        int divs = (int)Math.ceil(length/(free));
+        int bufSize = (int)Math.floor(free/4);
+
+        //System.out.println("number of divisions "+Math.ceil(a.length()/(r.freeMemory()*R)));
+        //System.out.println("max buffer size is: "+ Math.floor(r.freeMemory()*R/4));
+        //System.out.println("test: "+ filename);
+
+        if(divs <= 1){
+            multRead = false;
+            ints = new int[(int)length/4];
+        } else {
+            bound = Integer.MAX_VALUE/(divs/2);
+            ints = new int[bufSize];
+        }
+        short runs = (multRead) ? (short)divs : 1;
+
 
         for (int j = 0; j < runs; j++) {
             index = 0;
 
-            switch (j) {
-                case 0:
-                    boundlower = b0;
-                    boundupper = b1;
-                    break;
-                case 1:
-                    boundlower = b1 + 1;
-                    boundupper = b2;
-                    break;
-                case 2:
-                    boundlower = b2 + 1;
-                    boundupper = b3;
-                    break;
-                case 3:
-                    boundlower = b3 + 1;
-                    boundupper = b4;
-                    break;
-                case 4:
-                    boundlower = b4 + 1;
-                    boundupper = b5;
-                    break;
-                case 5:
-                    boundlower = b5 + 1;
-                    boundupper = b6;
-                    break;
+            if(j == 0) {
+                boundlower = Integer.MIN_VALUE;
+                boundupper = boundlower + bound;
             }
+            else {
+                boundlower = boundupper+1;
+                if(j == runs-1){
+                    boundupper = Integer.MAX_VALUE;
+                } else {
+                    boundupper = boundlower + bound -1;
+                }
+            }
+
+
 
             try {
                 fis = new RandomAccessFile(a, "r");
@@ -96,17 +105,11 @@ public class testSort {
                         for (int i = 0; i < bytesRead; i++) {
                             pos = 4 * i;
 
-                            x = (((int) buf[pos + 3]) & 255)
-                                    | ((((int) buf[pos + 2]) & 255) << 8)
-                                    | ((((int) buf[pos + 1]) & 255) << 16)
-                                    | ((((int) buf[pos]) & 255) << 24);
-
-                            /*
                             x = (((int)buf[pos]) & 255) << 24
                                     | ((((int) buf[pos + 1]) & 255) << 16)
                                     | ((((int) buf[pos + 2]) & 255) << 8)
                                     | ((((int) buf[pos + 3]) & 255));
-                                    */
+
 
                             if (boundlower <= x && x <= boundupper) {
                                 ints[index] = x;
@@ -116,12 +119,7 @@ public class testSort {
                     } else {
                         for (int i = 0; i < bytesRead; i++) {
                             pos = 4 * i;
-                            /*
-                            x = (((int) buf[pos + 3]) & 255)
-                                    | ((((int) buf[pos + 2]) & 255) << 8)
-                                    | ((((int) buf[pos + 1]) & 255) << 16)
-                                    | ((((int) buf[pos]) & 255) << 24);
-                            */
+
                             x = (((int)buf[pos]) & 255) << 24
                                     | ((((int) buf[pos + 1]) & 255) << 16)
                                     | ((((int) buf[pos + 2]) & 255) << 8)
@@ -139,7 +137,11 @@ public class testSort {
 
             if (index > 0) {
                 //Arrays.sort(ints, 0, index);
-                DPQsort.dpQsort(ints, 0, index-1);
+                //DPQsort.dpQsort(ints, 0, index-1);
+                //ThreadedDPQsort sorter = new ThreadedDPQsort();
+                //sorter.dpQsort(ints, 0, index-1);
+                sorter = new ForkJoinQsort();
+                sorter.run(ints, 0, index-1);
                 //dualPivotQuicksort(ints, 0, index-1, 3);
             }
 
@@ -177,6 +179,10 @@ public class testSort {
 
         //Path temp = a.toPath();
         //b.renameTo(a);
+
+        //Alg finished, set relevant values to null to save space.
+        buf = null; ints = null; sorter = null; fis = null; fos = null;
+        r = null;
 
     }
 }
