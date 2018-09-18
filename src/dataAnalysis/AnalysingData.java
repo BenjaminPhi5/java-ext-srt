@@ -4,6 +4,7 @@ import dataAnalysis.ReadIn.*;
 import dataAnalysis.readSpeeds.*;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 public class AnalysingData {
 
@@ -35,12 +36,13 @@ public class AnalysingData {
 
 
             //memoryAvailable();
-            //fileSizeEst(); //getting the file size takes no time at all. Noice.
+            fileSizeEst(); //getting the file size takes no time at all. Noice.
             //testIntegerValues();
             //testBucketValues();
             //testLinearBuckets();
             //getSmallestRange();
-            getCulmativeBoundaries();
+            //getCulmativeBoundaries();
+            //getByteBounds();
 
         }
 
@@ -159,6 +161,33 @@ public class AnalysingData {
     public void getCulmativeBoundaries() throws IOException{
         ByteArrayAndByteBuffer byteArrayAndByteBuffer = new ByteArrayAndByteBuffer();
         byteArrayAndByteBuffer.culmfreqBoundaries(f2);
+    }
+
+    public void getByteBounds(){
+        byte b0 = intToBytes(Integer.MIN_VALUE)[0];
+        byte b1 = intToBytes(-1417140587)[0];
+        byte b2 = intToBytes(-687496445)[0];
+        byte b3 = intToBytes(43169891)[0];
+        byte b4 = intToBytes(773465171)[0];
+        byte b5 = intToBytes(1503894278)[0];
+        byte b6 = intToBytes(Integer.MAX_VALUE)[0];
+
+        System.out.println("bound0: "+ b0);
+        System.out.println("bound1: "+ b1);
+        System.out.println("bound2: "+ b2);
+        System.out.println("bound3: "+ b3);
+        System.out.println("bound4: "+ b4);
+        System.out.println("bound5: "+ b5);
+        System.out.println("bound6: "+ b6);
+
+
+
+    }
+
+    public byte[] intToBytes( final int i ) {
+        ByteBuffer bb = ByteBuffer.allocate(4);
+        bb.putInt(i);
+        return bb.array();
     }
 
 }

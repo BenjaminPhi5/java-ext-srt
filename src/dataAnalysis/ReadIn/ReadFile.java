@@ -1,6 +1,8 @@
 package dataAnalysis.ReadIn;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 
 public class ReadFile {
 
@@ -9,9 +11,16 @@ public class ReadFile {
 
         File file = new File(filename);
         long time;
-        time = System.currentTimeMillis();
+        time = System.nanoTime();
         System.out.println("filesize: " + file.length());
-        System.out.println("time: " + (System.currentTimeMillis()-time));
+        System.out.println("time: " + (System.nanoTime()-time));
+
+        try {
+            RandomAccessFile fis = new RandomAccessFile(filename, "r");
+            time = System.nanoTime();
+            System.out.println("length: " + fis.length());
+            System.out.println("time: " + (System.nanoTime() - time));
+        } catch (IOException e){e.printStackTrace();};
 
 
     }

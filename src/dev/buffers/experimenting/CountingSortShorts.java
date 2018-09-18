@@ -7,18 +7,18 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 
 public class CountingSortShorts {
-    FileInputStream fis;
-    FileOutputStream fos;
+
     public static final int BUF_SIZE = 1<<16;
     public static final int ARR_SIZE = 1000;
 
-    public void run(String fin, String fout){
+    public static final void run(String fin, String fout){
+
+        FileInputStream fis;
+        FileOutputStream fos;
 
         short[] arr = new short[ARR_SIZE];
         int n; int bytesRead; int x; int pos;
         byte[] buf = new byte[BUF_SIZE];
-        //short one = 1;
-
 
         try {
             fis = new FileInputStream(fin);
@@ -36,14 +36,14 @@ public class CountingSortShorts {
                     arr[x] = (short)(arr[x]+1);
                 }
             }
-            //fis.close();
-
 
             fos = new FileOutputStream(fout);
             int i; int j; int loc = 0;
             byte b1; byte b2; byte b3; byte b4;
 
-            for(i = 0; i < arr.length; i++){
+            int length = arr.length;
+
+            for(i = 0; i < length; i++){
                 x = Short.toUnsignedInt(arr[i]);
                 if(x > 0) {
                     b1 = (byte) (i >> 24); b2 = (byte) (i >> 16); b3 = (byte) (i >> 8); b4 = (byte) (i);
