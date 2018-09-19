@@ -1,6 +1,7 @@
 import dataAnalysis.AnalysingData;
 import dev.TestAlg;
 import dev.buffers.experimenting.CountingSortShorts;
+import dev.buffers.experimenting.HashMapQuickSort;
 import dev.buffers.experimenting.testSort;
 
 import java.io.FileInputStream;
@@ -24,10 +25,14 @@ public class ExternalSort {
             dev.buffers.experimenting.SingleReadSort.run(f1, f2);
         } else {
             // read in first 10 values, see what theyre like. depending, get counting sort
-            int max = range(fis);
+            int[] analysis = range(fis);
 
-            if(max < 1000){
-                CountingSortShorts.run(f1, f2);
+            if(analysis[0] < 1000){
+                if(analysis[1] > 1000 || analysis[2] < 0){
+                    HashMapQuickSort.run(f1, f2);
+                } else {
+                    CountingSortShorts.run(f1, f2);
+                }
             } else{
                 // if size less than 6 mb, read in whole file once, else do 6 way split.
                 if(l <= 6000000) {
@@ -42,11 +47,11 @@ public class ExternalSort {
 
     }
 
-    private static int range(RandomAccessFile fis){
-        byte[] buf = new byte[40];
+    private static int[] range(RandomAccessFile fis){
+        byte[] buf = new byte[1<<16];
         int bytesRead = 0;
         try { bytesRead = fis.read(buf) / 4; } catch (IOException e) { e.printStackTrace(); }
-        int pos; int x; int max = Integer.MIN_VALUE;
+        int pos; int x; int max = Integer.MIN_VALUE; int min = Integer.MAX_VALUE;
         for (int i = 0; i < bytesRead; i++) {
             pos = 4 * i;
 
@@ -55,11 +60,20 @@ public class ExternalSort {
                     | ((((int) buf[pos + 2]) & 255) << 8)
                     | ((((int) buf[pos + 3]) & 255));
 
+            if(x < min)
+                min = x;
             if(x > max)
                 max = x;
-
         }
-        return max;
+        min = min/1000 * 1000;
+        System.out.println("rounded down min: "+ min);
+        max = ((max + 99) / 100 ) * 100;
+        System.out.println("rounded up max" + max);
+        int range = max - min;
+        if(range < 0){
+            range*= -1;
+        }
+        return new int[]{range, max, min};
     }
 
 

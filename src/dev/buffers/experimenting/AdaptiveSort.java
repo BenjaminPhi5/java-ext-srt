@@ -70,6 +70,7 @@ public class AdaptiveSort {
             multRead = false;
             ints = new int[(int)length/4];
         } else {
+            divs++;
             bound = Integer.MAX_VALUE/(divs/2);
             ints = new int[bufSize];
         }
